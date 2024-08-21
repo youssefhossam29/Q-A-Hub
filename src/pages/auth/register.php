@@ -102,6 +102,9 @@
                             <div class="col-md-8 offset-md-4">
                                 <input type="submit" class="btn btn-primary" value="Register">
                             </div>
+                            <div class="col-md-8 offset-md-4 mt-3">
+                                <p>Already have an account? <a href="login.php">Login here</a></p>
+                            </div>
                         </div>
                     </form>
                 </div>

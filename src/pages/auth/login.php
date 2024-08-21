@@ -57,11 +57,12 @@
                             </div>
                         </div>
 
-
                         <div class="row mb-0">
                             <div class="col-md-8 offset-md-4">
                                 <input type="submit" class="btn btn-primary" value="Login">
-                                <a class="btn btn-link">forgot your password?</a>
+                            </div>
+                            <div class="col-md-8 offset-md-4 mt-3">
+                                <p>Don't have an account? <a href="register.php">Register here</a></p>
                             </div>
                         </div>
                     </form>
@@ -70,7 +71,3 @@
         </div>
     </div>
 </div>
-
-
-
-

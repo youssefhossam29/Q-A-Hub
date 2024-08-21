@@ -645,5 +645,48 @@
         $con->close();
         return $categories;
     }
+
+
+
+    function userFollowingCategories($user_id, $start, $rows_per_page){
+        if ($user_id <= 0) {
+            header("Location:./home.php?errorMessage=Can't select data of user");
+            die;
+        }
+
+
+        $query = " SELECT u.id, u.name, u.photo, COUNT(DISTINCT b.id) AS total_questions, COUNT(DISTINCT uc.category_id) AS number_of_followed_categories
+                    FROM users u
+                    LEFT JOIN questions b ON u.id = b.author_id
+                    LEFT JOIN users_categories uc ON u.id = uc.user_id
+                    WHERE u.id = $user_id;
+                ";
+                
+        $query .= "SELECT c.id, c.name, c.image
+                    FROM categories c 
+                    JOIN users_categories uc ON c.id = uc.category_id
+                    WHERE uc.user_id = $user_id
+                    ORDER BY c.id DESC
+                    LIMIT $start, $rows_per_page;
+                ";
+
+
+        $con = connection();
+        $data = []; 
+        if (mysqli_multi_query($con, $query)){
+            do{
+                if ($result = mysqli_store_result($con)){
+                    $rows =  mysqli_fetch_all($result, MYSQLI_ASSOC);
+                    $data[] = $rows;
+                    mysqli_free_result($result);
+                }
+            }while (mysqli_next_result($con));
+        }else{
+            header("Location:./home.php?errorMessage=Can't select Questions of User");
+            die;
+        }
+        $con->close();
+        return ["user" =>$data[0][0], "categories" =>$data[1]];   
+    }
     
 ?>

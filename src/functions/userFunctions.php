@@ -82,19 +82,26 @@
 
 
     function createQuestion($title, $content, $image, $category_id){
-        $_GET['errorTitle'] = validateQuestion($title, 'title');
-        $_GET['errorContent'] = validateQuestion($content, 'content');
-        $_GET['errorImage'] = validateFile($image);
+        $_GET['errorTitle'] = validateQuestionTitle($title);
+        $_GET['errorContent'] = validateQuestionContent($content);
         $_GET['errorCategory'] = validateCategoryId($category_id);    
 
-        if(!empty($_GET['errorTitle']) || !empty($_GET['errorContent']) || !empty($_GET['errorImage']) || !empty($_GET['errorCategory'])  ){
+        if(!empty($_GET['errorTitle']) || !empty($_GET['errorContent']) || !empty($_GET['errorCategory'])  ){
             return 0;
         }
 
-        $new_image_name = uploadFile($image, "../../../public/uploads/questions/");
-        if(!$new_image_name){
-            header("Location:./addQuestion.php?errorMessage=Can't upload the image");
-            die;
+        if(empty(trim($image['name']))){
+            $new_image_name = "question.png";
+        }else{
+            $_GET['errorImage'] = validateFile($image);
+            if(($_GET['errorImage'])){
+                return 0;
+            }
+            $new_image_name = uploadFile($image, "../../../public/uploads/questions/");
+            if(!$new_image_name){
+                header("Location:./showQuestion.php?question_slug=$question_slug&errorMessage=Can't upload new image");
+                die;
+            }
         }
 
         $author_id = $_SESSION['userdata']['id']; 
@@ -116,8 +123,8 @@
 
 
     function updateQuestion($question_slug, $title, $content, $image, $category_id){
-        $_GET['errorTitle'] = validateQuestion($title, 'title');
-        $_GET['errorContent'] = validateQuestion($content, 'content');
+        $_GET['errorTitle'] = validateQuestionTitle($title);
+        $_GET['errorContent'] = validateQuestionContent($content);
         $_GET['errorCategory'] = validateCategoryId($category_id);    
 
         if(!empty($_GET['errorTitle']) || !empty($_GET['errorContent']) || !empty($_GET['errorCategory']) ){
@@ -153,11 +160,19 @@
     }
 
 
-    function validateQuestion($input , $input_name){
-        if(empty(trim($input))){ 
-            $error = "you must enter $input_name";
+    function validateQuestionTitle($title){
+        if(empty(trim($title))){
+            return "You must enter title";
         }
-        return isset($error) ? $error : null ;
+        return null ;
+    }
+
+
+    function validateQuestionContent($content){
+        if(empty(trim($content))){
+            return "You must enter title";
+        }
+        return null ;
     }
 
 

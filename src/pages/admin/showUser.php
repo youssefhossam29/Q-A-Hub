@@ -49,13 +49,12 @@
         </h2>
         
         <hr class="mb-2">
-        <div class=" col-lg-3 btn btn-light"> <i class="fa-solid fa-envelope"></i>  <?= $user['email'];?> </div>
-        <div class=" col-lg-2 btn btn-light"> <i class="fa-solid fa-user"></i> <?= ($user['admin'] == 1)?"Admin":"User";?> </div>
-        <div class=" col-lg-2 btn btn-light"> <i class="fa-solid fa-venus-mars"></i>  <?= ($user['gender'] == 1)? "Male":"Female"; ?> </div>      
+        <div class=" col- btn btn-light"> <i class="fa-solid fa-envelope"></i>  <?= $user['email'];?> </div>
+        <div class=" col- btn btn-light"> <i class="fa-solid fa-user"></i> <?= ($user['admin'] == 1)?"Admin":"User";?> </div>
+        <div class=" col- btn btn-light"> <i class="fa-solid fa-venus-mars"></i>  <?= ($user['gender'] == 1)? "Male":"Female"; ?> </div>      
         <?php if($user['admin'] == 1) die; ?>
-        <div class=" col-lg-1 btn btn-light"> Questions:  <?= $user['total_questions'];?> </div>
-        <div class=" col-lg-3 btn btn-light"> Following Categories:  <?= $user['number_of_followed_categories'];?> </div>
-
+        <a href="#" class=" col- btn btn-light"> Number of Questions:  <?= $user['total_questions'];?> </a>
+        <a href="followingCategories.php?user_id=<?= $user_id; ?>" class=" col- btn btn-light"> Number of following Categories:  <?= $user['number_of_followed_categories'];?> </a>
 </div>
                                   
 

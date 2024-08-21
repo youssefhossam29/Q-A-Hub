@@ -580,7 +580,7 @@
             header("Location:./allCategories.php?errorMessage=Can't follow category");
             die;
         }
-        $_SESSION['followedCategoriesIds'] = showFollowedCategories('id');
+        $_SESSION['followedCategoriesIds'] = showFollowedCategories();
         $con->close();
         header("Location:./allCategories.php?successMessage=You've successfully followed the category");
     }
@@ -600,31 +600,15 @@
             header("Location:./allCategories.php?errorMessage=Can't follow category");
             die;
         }
-        $_SESSION['followedCategoriesIds'] = showFollowedCategories('id');
+        $_SESSION['followedCategoriesIds'] = showFollowedCategories();
         $con->close();
         header("Location:./allCategories.php?successMessage=You've successfully unfollowed the category");
     }
     
     
-    function showFollowedCategories($type, $start =0, $rows_per_page = 3) {
+    function showFollowedCategories() {
         $user_id = $_SESSION['userdata']['id'];
-        switch ($type){
-            case 'id':
-                $query = "SELECT category_id AS id FROM users_categories WHERE user_id = $user_id;";
-            break; 
-    
-            case 'all':
-                $query = "SELECT c.id, c.name, c.image, COUNT(*) OVER() AS total_categories FROM categories c
-                            JOIN users_categories uc ON c.id = uc.category_id
-                            WHERE uc.user_id = $user_id
-                            LIMIT $start, $rows_per_page;
-                        ";
-            break;
-    
-            default:
-                die("Error");
-        }
-    
+        $query = "SELECT category_id AS id FROM users_categories WHERE user_id = $user_id;";
         $user_id = $_SESSION['userdata']['id'];
         $con = connection();
         $data = mysqli_query($con,$query);
@@ -632,16 +616,13 @@
             return [];
         }
     
-        if($type == 'id'){
-            $categories = array(); 
-            if (mysqli_num_rows($data) > 0) {
-                while ($row = mysqli_fetch_assoc($data)) {
-                    $categories[] = $row['id'];
-                }
-            }        
-        }else{
-            $categories = mysqli_fetch_all($data, MYSQLI_ASSOC);
-        }
+        $categories = array(); 
+        if (mysqli_num_rows($data) > 0) {
+            while ($row = mysqli_fetch_assoc($data)) {
+                $categories[] = $row['id'];
+            }
+        }        
+        
         $con->close();
         return $categories;
     }
@@ -653,7 +634,6 @@
             header("Location:./home.php?errorMessage=Can't select data of user");
             die;
         }
-
 
         $query = " SELECT u.id, u.name, u.photo, COUNT(DISTINCT b.id) AS total_questions, COUNT(DISTINCT uc.category_id) AS number_of_followed_categories
                     FROM users u

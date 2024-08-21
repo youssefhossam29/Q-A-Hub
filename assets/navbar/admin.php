@@ -9,7 +9,7 @@
         </li>
 
         <li class="nav-item">
-            <a class="nav-link <?php echo ($pageName  == 'allUsers.php' || $pageName  == 'showUser.php' || $pageName  == 'createAdmin.php' ) ? 'active' : ''; ?>" aria-current="page" href="allUsers.php">Users</a>
+            <a class="nav-link <?php echo ($pageName  == 'allUsers.php' || $pageName  == 'showUser.php' || $pageName  == 'createAdmin.php' || $pageName  == 'followingCategories.php' ) ? 'active' : ''; ?>" aria-current="page" href="allUsers.php">Users</a>
         </li>
 
         <li class="nav-item">

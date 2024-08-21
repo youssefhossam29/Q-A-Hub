@@ -5,20 +5,21 @@
    
 
     // login and register functions
-    function validate($input , $inputName, $regx){
-        if(empty(trim($input))){
-            $error = "You must enter $inputName";
-        }elseif(!preg_match($regx,  $input)){
-            $error = "The $inputName you enterd doesn't match the required format";
+    function validtaeName($name){
+        if(empty(trim($name))){
+            return "You must enter your Name";
+        }elseif(!preg_match("/^[A-Za-z][A-Za-z 0-9]{2,49}$/",  trim($name))){
+            return "Name must start with a letter and be 3-50 characters long, containing only letters, numbers";
         }
-        return isset($error) ? $error : null ;
+        return null ;
     }
 
 
-    function checkEmail($email){
-        $_GET['errorEmail'] = validate($email, 'email', "/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/");
-        if($_GET['errorEmail']){
-            return $_GET['errorEmail'];
+    function validateEmail($email){
+        if(empty(trim($email))){
+            return "You must enter your Email";
+        }elseif(!preg_match("/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/",  $email)){
+            return "Please enter a valid email address in the format example@example.com";
         }
 
         if(isset($_SESSION['userdata'])){
@@ -38,13 +39,38 @@
     }
 
 
-    function validateImage($image){
+    function validatePassword($pass){
+        if(empty($pass)){
+            return "You must enter your Password";
+        }elseif(!preg_match("/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d\s@$!%*#?&]{8,}$/",  $pass)){
+            return "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one digit";
+        }
+        return null;
+    }
 
+
+    function validatePasswordConfirm($pass, $pass_confirm){
+        if($pass != $pass_confirm){
+            return "Two password must be the same";
+        }
+        return null;
+    }
+
+
+    function validateGender($gender){
+        if(!preg_match("/^(m|f)$/", $gender) || empty(trim($gender)) ){
+            return "You must select your Gender";
+        }
+        return null ;
+    }
+
+
+    function validateImage($image){
         // check type file
-        $fileName = $image['name'];
-        $fileType = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-        $allowedTypes = ['jpg', 'png', 'jpeg', 'gif'];
-        if (!in_array($fileType, $allowedTypes)) {
+        $file_name = $image['name'];
+        $file_type = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
+        $allowed_types = ['jpg', 'png', 'jpeg', 'gif'];
+        if (!in_array($file_type, $allowed_types)) {
             $error = "Sorry, only JPG, JPEG, PNG, & GIF files are allowed.";
             return $error;
         }
@@ -54,41 +80,30 @@
             $error = "Your file is too large, Maximum size is 3MB";
             return $error;
         }
-
         return null;
     }
 
 
     function uploadImage($file, $path){
-        $fileName = $file['name'];
-        $fileType = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-        $fileTmpName = $file['tmp_name'];
-        $newFileName = bin2hex(random_bytes(16)).time(). ".$fileType";
-        $flag = move_uploaded_file($fileTmpName, $path.$newFileName);
+        $file_name = $file['name'];
+        $file_type = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
+        $file_tmp_name = $file['tmp_name'];
+        $new_file_name = bin2hex(random_bytes(16)).time(). ".$file_type";
+        $flag = move_uploaded_file($file_tmp_name, $path.$new_file_name);
         if($flag){
-            return $newFileName;
+            return $new_file_name;
         }else{
             return 0;
         }
     }
     
 
-    function validatePasswordConfirm($pass, $passConfirm){
-        if($pass != $passConfirm){
-            $errorPassConfirm = "two password must be the same";
-        }
-        return isset($errorPassConfirm) ? $errorPassConfirm : null ;
-    }
- 
-
-
-    function register($name, $email, $pass, $passConfirm, $gender){
-        
-        $_GET['errorName'] = validate($name, 'name', "/^[A-Za-z][A-Za-z 0-9]{1,49}$/");
-        $_GET['errorEmail'] = checkEmail($email);
-        $_GET['errorPass'] = validate($pass, 'password', "/^[A-Za-z\d@$!%*#?&]{8,}$/");
-        $_GET['errorGender'] = validate($gender, 'gender', "/^(m|f)$/");
-        $_GET['errorPassConfirm'] = validatePasswordConfirm($pass, $passConfirm);
+    function register($name, $email, $pass, $pass_confirm, $gender){
+        $_GET['errorName'] = validtaeName($name);
+        $_GET['errorEmail'] = validateEmail($email);
+        $_GET['errorPass'] = validatePassword($pass);
+        $_GET['errorPassConfirm'] = validatePasswordConfirm($pass, $pass_confirm);
+        $_GET['errorGender'] = validateGender($gender);
 
         if(!empty($_GET['errorName']) || !empty($_GET['errorEmail']) || !empty($_GET['errorPass']) || !empty($_GET['errorPassConfirm']) || !empty($_GET['errorGender']) ){
             return 0;
@@ -100,7 +115,6 @@
         $con = connection();
         mysqli_query($con,$query);
         $result = mysqli_affected_rows($con);
-
 
         if($result){
             $inserted_id =  mysqli_insert_id($con);
@@ -123,11 +137,9 @@
 
     
     function login($email, $pass){
-        
         if(empty(trim($email))){
             $_GET['errorEmail'] = "you must enter your email";
         }
-        
         if(empty(trim($pass))){
             $_GET['errorPass'] = "you must enter your password";
         }
@@ -165,15 +177,12 @@
     }
 
 
-
-
-    function createAdmin($name, $email, $pass, $passConfirm, $gender){
-        
-        $_GET['errorName'] = validate($name, 'name', "/^[A-Za-z][A-Za-z 0-9]{1,49}$/");
-        $_GET['errorEmail'] = checkEmail($email);
-        $_GET['errorPass'] = validate($pass, 'password', "/^[A-Za-z\d@$!%*#?&]{8,}$/");
-        $_GET['errorGender'] = validate($gender, 'gender', "/^(m|f)$/");
-        $_GET['errorPassConfirm'] = validatePasswordConfirm($pass, $passConfirm);
+    function createAdmin($name, $email, $pass, $pass_confirm, $gender){    
+        $_GET['errorName'] = validtaeName($name);
+        $_GET['errorEmail'] = validateEmail($email);
+        $_GET['errorPass'] = validatePassword($pass);
+        $_GET['errorPassConfirm'] = validatePasswordConfirm($pass, $pass_confirm);
+        $_GET['errorGender'] = validateGender($gender);
 
         if(!empty($_GET['errorName']) || !empty($_GET['errorEmail']) || !empty($_GET['errorPass']) || !empty($_GET['errorPassConfirm']) || !empty($_GET['errorGender']) ){
             return 0;
@@ -195,14 +204,12 @@
     }
 
     
-
-    function updateUser($name, $email, $image, $pass, $passConfirm, $gender){  
-        
+    function updateUser($name, $email, $image, $pass, $pass_confirm, $gender){  
         $user_id = $_SESSION['userdata']['id'];
         $query = "";
         if(!empty(trim($pass))){
-            $_GET['errorPass'] = validate($pass, 'password', "/^[A-Za-z\d@$!%*#?&]{8,}$/");
-            $_GET['errorPassConfirm'] = validatePasswordConfirm($pass, $passConfirm);
+            $_GET['errorPass'] = validatePassword($pass);
+            $_GET['errorPassConfirm'] = validatePasswordConfirm($pass, $pass_confirm);
             if(!empty($_GET['errorPassConfirm']) || !empty($_GET['errorPass']) ){
                 return 0;
             }
@@ -216,17 +223,17 @@
                 return 0;
             }
 
-            $newImageName = uploadImage($image, "../../../public/uploads/users/");
-            if(!$newImageName){
+            $new_image_name = uploadImage($image, "../../../public/uploads/users/");
+            if(!$new_image_name){
                 header("Location:./updateProfile.php?errorMessage=Could not upload the image");
                 die;
             }
-            $query .= "UPDATE users SET photo = '$newImageName' WHERE id = '$user_id';"; 
+            $query .= "UPDATE users SET photo = '$new_image_name' WHERE id = '$user_id';"; 
         }
 
-        $_GET['errorName'] = validate($name, 'name', "/^[A-Za-z][A-Za-z 0-9]{1,49}$/");
-        $_GET['errorGender'] = validate($gender, 'gender', "/^(m|f)$/");
-        $_GET['errorEmail'] = checkEmail($email);
+        $_GET['errorName'] = validtaeName($name);
+        $_GET['errorGender'] = validateGender($gender);
+        $_GET['errorEmail'] = validateEmail($email);
 
         if(!empty($_GET['errorName']) || !empty($_GET['errorEmail']) || !empty($_GET['errorGender']) ){
             return 0;
@@ -240,7 +247,7 @@
         if($data) {
             $_SESSION['userdata']['name'] = $name;
             $_SESSION['userdata']['email'] = $email;
-            $_SESSION['userdata']['photo'] = isset($newImageName)? $newImageName: $_SESSION['userdata']['photo'];
+            $_SESSION['userdata']['photo'] = isset($new_image_name)? $new_image_name: $_SESSION['userdata']['photo'];
             $_SESSION['userdata']['gender'] = $gender;
             $_SESSION['userdata']['admin'] = $_SESSION['userdata']['admin'];            
             header("Location:./updateProfile.php?successMessage=Profile updated successfully");
@@ -250,7 +257,6 @@
     }
 
 
-
     function logout(){
         session_destroy(); 
         if (isset($_COOKIE[session_name()])) {
@@ -258,6 +264,5 @@
         }
         header("LOCATION:../auth/login.php");
     }
-
 
 ?>

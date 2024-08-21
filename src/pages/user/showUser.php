@@ -46,8 +46,11 @@
         <h1> <?= $user['name']; ?></h1>
         <hr class="mb-2">        
         <div class=" col-lg-4 btn btn-light"> Number of Questions:  <?= $number_of_questions;?> </div>
-        <a href="followingCategory.php" class=" col-lg-4 btn btn-light"> Number of following Categories:  <?= $user['number_of_followed_categories'];?> </a>
-
+        <?php if($_SESSION['userdata']['id'] == $user_id){ ?>
+            <a href="followingCategories.php" class=" col-lg-4 btn btn-light"> Number of following Categories:  <?= $user['number_of_followed_categories'];?> </a>
+        <?php }else{ ?>
+            <div class=" col-lg-4 btn btn-light"> Number of following Categories:  <?= $user['number_of_followed_categories'];?> </div>
+        <?php } ?>
 </div>
 
 <div class="container" style="margin-bottom: 80px;">

@@ -73,8 +73,8 @@
                                 </div>
                                 <?php if( $answer['answer_author_id'] == $user['id'] ): ?>
                                     <div class="mt-2" >
-                                        <small style="margin-left:20px;"><a href="updateanswer.php?answer_id=<?= $answer['answer_id'];?>&question_slug=<?= $question['question_slug'];?>"> <i class="fa-solid fa-pen-to-square"></i> </a></small>
-                                        <small style="margin-left:5px;" ><a href="deleteanswer.php?answer_id=<?= $answer['answer_id'];?>&question_slug=<?= $question['question_slug'];?>"> <i class="fa-solid fa-trash"></i> </a></small>
+                                        <small style="margin-left:20px;"><a href="updateAnswer.php?answer_id=<?= $answer['answer_id'];?>&question_slug=<?= $question['question_slug'];?>"> <i class="fa-solid fa-pen-to-square"></i> </a></small>
+                                        <small style="margin-left:5px;" ><a href="deleteAnswer.php?answer_id=<?= $answer['answer_id'];?>&question_slug=<?= $question['question_slug'];?>"> <i class="fa-solid fa-trash"></i> </a></small>
                                     </div>
                                 <?php endif; ?>
                             </div>

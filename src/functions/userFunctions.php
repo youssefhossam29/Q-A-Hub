@@ -479,7 +479,7 @@
 
     function getCategoriesInfo(){
         $con = connection();
-        $query = "SELECT * FROM Categories";
+        $query = "SELECT * FROM categories";
         $con = connection();
         $data = mysqli_query($con,$query);
         $result = mysqli_affected_rows($con);

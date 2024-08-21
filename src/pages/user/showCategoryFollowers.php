@@ -8,7 +8,6 @@
     include '../../../assets/layout.php'; 
     include '../../functions/userFunctions.php';
 
-
     if(isset($_GET['successMessage'])) {
         echo '<div class="container mt-4 d-flex justify-content-center">
         <div class="alert alert-success col-md-6 text-center">' . $_GET['successMessage'] . '</div> </div>';
@@ -29,20 +28,18 @@
         $start = $page * $rows_per_page;
     }
 
-    $data = showCategoryQuestions($category_id, $start, $rows_per_page); 
+    $data = showCategoryFollowers($category_id, $start, $rows_per_page); 
     $category = $data['category'];
-    $questions = $data['questions'];
+    $users = $data['users'];
     $number_of_questions = $category['total_questions'];
     $number_of_followers = $category['total_followers'];
     $followed_categories_ids = isset($_SESSION['followedCategoriesIds']) ? $_SESSION['followedCategoriesIds'] : [];
-    $number_of_pages = ceil($number_of_questions / $rows_per_page);
- 
+    $number_of_pages = ceil($number_of_followers / $rows_per_page);
 ?>
 
    
 <div class="jumbotron container">
         <img class="img-lg rounded-circle" width="130px" height="130px" src="../../../public/uploads/categories/<?= $category['image']; ?>" alt="category_image">
-        
         <h2> 
             <?= $category['name']; ?>
             <?php if (in_array($category['id'], $followed_categories_ids)): ?>
@@ -51,39 +48,32 @@
                 <a href="followCategory.php?category_id=<?php echo $category_id; ?>" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Follow</a>
             <?php endif; ?>
         </h2>
-
         <hr class="mb-2">
-        <a href="#" class="col-lg-4 btn btn-light"> Number of Questions:  <?= $number_of_questions;?> </a>
-        <a href="showCategoryFollowers.php?category_id=<?= $category_id; ?>" class="col-lg-4 btn btn-light"> Number of Followers:  <?= $number_of_followers;?> </a>
+        <a href="showCategoryQuestions.php?category_id=<?= $category_id; ?>" class=" col-lg-4 btn btn-light"> Number of Questions:  <?= $number_of_questions;?> </a>
+        <a href="#" class=" col-lg-4 btn btn-light"> Number of Followers:  <?= $number_of_followers;?> </a>
 </div>
-
 
 <div class="container" style="margin-bottom: 80px;">
 
     <?php         
-        if ($number_of_questions == 0) {
+        if ($number_of_followers == 0) {
             echo '<div class="container mt-4 d-flex justify-content-center">
-            <div class="alert alert-danger col-md-6 text-center"> There is no Questions</div> </div>';
+            <div class="alert alert-danger col-md-6 text-center"> There is no Followers</div> </div>';
             die;
         }
     ?>
 
     <div class="row">
-        <?php foreach($questions as $question): ?>
-            <div class="col-lg-4 col-md-6 mb-4">
-                <div class="card question-card" style=" border-radius: 0.5rem;">
-                    <div class="card-body question-content">
-                        <a href="showCategoryQuestions.php?category_id=<?= $category['id']; ?>" style="color:white"> 
-                            <h4 class="badge bg-secondary" style="font-size: 0.9rem; font-weight: bold; padding: 0.25rem 0.5rem; border-radius: 0.25rem;text-decoration: none;"><?= $category['name'];?></h4> 
-                        </a>                                    
-                        
-                        <p class="question-author">by <a href="./showUser.php?user_id=<?=$question['author_id'];?>"><?=$question['author_name'];?></a></p>
-                        <hr>
-
-                        <a href='./showQuestion.php?question_slug=<?= $question['question_slug'] ?>'><h3 class="question-title"><?= $question['question_title']; ?></h3></a>
+        <?php foreach($users as $user): ?>
+            <div class="col-md-6 col-lg-4 grid-margin stretch-card">
+                <div class="card card-rounded pb-2" style="border-radius: 15px;">
+                    <div class="card-body pb-0">
+                        <a href="showUser.php?user_id=<?= $user['user_id'];?>" style="text-decoration: none">
+                            <h5 class="card-title card-title-dash mb-4"> <?= $user['user_name'];?></h5>
+                        </a>  
+                        <img class="img-lg fluid" width="130px" height="130px" src="../../../public/uploads/users/<?= $user['user_photo']; ?>" alt="user_image">
+                                                                                                  
                     </div>
-                
-                    <img src="../../../public/uploads/questions/<?= $question['question_image']; ?>" class="question-img img-fluid" alt="question Image" style="border-radius: 0.5rem;margin:10px;height:250px">
                 </div>
             </div>
         <?php endforeach; ?>
@@ -106,4 +96,6 @@
             </ul>
     </nav>
 </div> 
+
+
 

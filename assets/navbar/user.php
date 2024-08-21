@@ -10,7 +10,7 @@
 
 
     <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle <?php echo ($pageName  == 'followingCategories.php'  || $pageName  == 'allCategories.php' || $pageName  == 'showCategoryQuestions.php') ? 'active' : ''; ?>" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Categories</a>
+        <a class="nav-link dropdown-toggle <?php echo ($pageName  == 'followingCategories.php'  || $pageName  == 'allCategories.php' || $pageName  == 'showCategoryQuestions.php' || $pageName  == 'showCategoryFollowers.php') ? 'active' : ''; ?>" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Categories</a>
             <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink" style="text-align: center">
                 <li><a href="allCategories.php" >All Categories</a></li>
                 <li><a href="followingCategories.php?user_id=<?= $_SESSION['userdata']['id'] ?>" >Following Categories</a></li>

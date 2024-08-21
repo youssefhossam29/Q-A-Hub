@@ -13,7 +13,7 @@
         </li>
 
         <li class="nav-item">
-            <a class="nav-link <?php echo ($pageName  == 'allCategories.php' || $pageName  == 'createCategory.php' || $pageName  == 'updateCategory.php' || $pageName  == 'showCategoryQuestions.php')  ? 'active' : ''; ?>" aria-current="page" href="allCategories.php">Categories</a>
+            <a class="nav-link <?php echo ($pageName  == 'allCategories.php' || $pageName  == 'createCategory.php' || $pageName  == 'updateCategory.php' || $pageName  == 'showCategoryQuestions.php' || $pageName  == 'showCategoryFollowers.php')  ? 'active' : ''; ?>" aria-current="page" href="allCategories.php">Categories</a>
         </li>
 
         <li class="nav-item">

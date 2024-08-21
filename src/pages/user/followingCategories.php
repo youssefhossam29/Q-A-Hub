@@ -45,8 +45,8 @@
         <img class="img-lg rounded-circle" width="130px" height="130px" src="../../../public/uploads/users/<?= $user['photo']; ?>" alt="user_image">
         <h1> <?= $user['name']; ?></h1>
         <hr class="mb-2">   
-        <a href="showUser.php?user_id=<?= $user_id; ?>" class=" col-lg-4 btn btn-light"> Number of Questions:  <?= $user['total_questions'];?> </a>
-        <a href="#" class=" col-lg-4 btn btn-light"> Number of following Categories:  <?= $user['number_of_followed_categories'];?> </a>
+        <a href="showUser.php?user_id=<?= $user_id; ?>" class="col-lg-4 btn btn-light"> Number of Questions:  <?= $user['total_questions'];?> </a>
+        <a href="#" class="col-lg-4 btn btn-light"> Number of following Categories:  <?= $user['number_of_followed_categories'];?> </a>
 </div>
 
 <div class="container" style="margin-bottom: 80px;">

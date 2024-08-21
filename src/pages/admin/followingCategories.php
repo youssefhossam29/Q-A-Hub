@@ -6,7 +6,7 @@
     }
 
     include '../../../assets/layout.php'; 
-    include '../../functions/userFunctions.php';
+    include '../../functions/adminFunctions.php';
 
 
     if(isset($_GET['successMessage'])) {
@@ -43,10 +43,19 @@
 
 <div class="jumbotron container">
         <img class="img-lg rounded-circle" width="130px" height="130px" src="../../../public/uploads/users/<?= $user['photo']; ?>" alt="user_image">
-        <h1> <?= $user['name']; ?></h1>
-        <hr class="mb-2">   
-        <a href="showUser.php?user_id=<?= $user_id; ?>" class=" col-lg-4 btn btn-light"> Number of Questions:  <?= $user['total_questions'];?> </a>
-        <a href="#" class=" col-lg-4 btn btn-light"> Number of following Categories:  <?= $user['number_of_followed_categories'];?> </a>
+        <h2> 
+            <?= $user['name']; ?>
+            <?php if($user['admin'] == 0): ?>
+                <a class="btn btn-danger" style ='text-decoration: none;' href='./deleteUser.php?user_id=<?= $user['id'] ?>'><i class = 'fas fa-trash'></i> Delete User </a>
+            <?php endif;?>
+        </h2>
+        <hr class="mb-2"> 
+        <div class="col- btn btn-light"> <i class="fa-solid fa-envelope"></i>  <?= $user['email'];?> </div>
+        <div class="col- btn btn-light"> <i class="fa-solid fa-user"></i> <?= ($user['admin'] == 1)?"Admin":"User";?> </div>
+        <div class="col- btn btn-light"> <i class="fa-solid fa-venus-mars"></i>  <?= ($user['gender'] == 1)? "Male":"Female"; ?> </div>      
+        <?php if($user['admin'] == 1) die; ?>  
+        <a href="showUser.php?user_id=<?= $user_id; ?>" class=" col- btn btn-light"> Number of Questions:  <?= $user['total_questions'];?> </a>
+        <a href="#" class=" col- btn btn-light"> Number of following Categories:  <?= $user['number_of_followed_categories'];?> </a>
 </div>
 
 <div class="container" style="margin-bottom: 80px;">

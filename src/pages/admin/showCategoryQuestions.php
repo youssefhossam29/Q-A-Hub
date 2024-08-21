@@ -46,8 +46,8 @@
             <a href="./deleteCategory.php?category_id=<?= $category_id;?>" class="btn btn-danger"><i class = 'fas fa-trash'></i> Delete</a> 
         </h2>
         <hr class="mb-2">
-        <div class=" col-lg-3 btn btn-light"> Number of Questions:  <?= $number_of_questions;?> </div>
-        <div class=" col-lg-4 btn btn-light"> Number of Followers:  <?= $number_of_followers;?> </div>
+        <a href="#" class=" col-lg-4 btn btn-light"> Number of Questions:  <?= $number_of_questions;?> </a>
+        <a href="showCategoryFollowers.php?category_id=<?= $category_id; ?>" class=" col-lg-4 btn btn-light"> Number of Followers:  <?= $number_of_followers;?> </a>
 </div>
 
 <div class="container" style="margin-bottom: 80px;">

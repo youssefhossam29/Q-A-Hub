@@ -397,6 +397,44 @@
     }
 
 
+    function showCategoryFollowers($category_id, $start, $rows_per_page){
+        if ( $category_id == 0) {
+            header("Location:./allCategories.php?errorMessage=Can't select questions of Category");
+            die;
+        }
+
+        $query = "SELECT c.name, c.id, c.image, COUNT(DISTINCT b.id) AS total_questions, COUNT(DISTINCT uc.user_id) AS total_followers
+                  FROM categories c
+                  LEFT JOIN questions b ON c.id = b.category_id
+                  LEFT JOIN users_categories uc ON c.id = uc.category_id
+                  WHERE c.id = $category_id
+                  GROUP BY c.id;";
+
+        $query .= "SELECT u.name AS user_name, u.id AS user_id, u.photo AS user_photo
+                    FROM users u
+                    JOIN users_categories uc ON u.id = uc.user_id
+                    WHERE uc.category_id = $category_id
+                    LIMIT $start, $rows_per_page;";
+
+        $con = connection();
+        $data = []; 
+        if (mysqli_multi_query($con, $query)){
+            do{
+                if ($result = mysqli_store_result($con)){
+                    $rows =  mysqli_fetch_all($result, MYSQLI_ASSOC);
+                    $data[] = $rows;
+                    mysqli_free_result($result);
+                }
+            }while (mysqli_next_result($con));
+        }else{
+            header("Location:./allCategories.php?errorMessage=Can't select Questions of Category");
+            die;
+        }
+        $con->close();
+        return ["category" =>$data[0][0], "users" =>$data[1]];
+    }
+
+
     function validateCategoryName($category_name){
         if(empty(trim($category_name))){
             return "you must enter name of category";
@@ -527,7 +565,7 @@
             die;
         }
 
-        $query = " SELECT u.id, u.name, u.photo, COUNT(DISTINCT b.id) AS total_questions, COUNT(DISTINCT uc.category_id) AS number_of_followed_categories
+        $query = " SELECT u.id, u.name, u.photo, u.admin, u.email, u.gender, COUNT(DISTINCT b.id) AS total_questions, COUNT(DISTINCT uc.category_id) AS number_of_followed_categories
                     FROM users u
                     LEFT JOIN questions b ON u.id = b.author_id
                     LEFT JOIN users_categories uc ON u.id = uc.user_id

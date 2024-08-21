@@ -397,11 +397,13 @@
     }
 
 
-    function validateCategory($input , $input_name){
-        if(empty(trim($input))){
-            $error = "you must enter $input_name";
+    function validateCategoryName($category_name){
+        if(empty(trim($category_name))){
+            return "you must enter name of category";
+        }elseif(!preg_match("/^[A-Za-z][A-Za-z0-9\s-]{2,49}$/",  trim($category_name))){
+            return "Category name must start with a letter, be 3-50 characters long, and may include numbers, spaces, and hyphens";
         }
-        return isset($error) ? $error : null ;
+        return  null ;
     }
 
 
@@ -443,7 +445,7 @@
 
     function createCategory($name, $image){
 
-        $_GET['errorName'] = validateCategory($name, 'name');
+        $_GET['errorName'] = validateCategoryName($name);
         $_GET['errorImage'] = validateFile($image);
         if(!empty($_GET['errorName']) || !empty($_GET['errorImage']) ){
             return 0;
@@ -469,9 +471,9 @@
     }
 
     
-    function updateCategory($category_id, $name, $image){
-        $_GET['errorName'] = validateCategory($name, 'name');
-        if(!empty($_GET['errorTitle']) ){
+    function updateCategory($category_id, $category_name, $image){
+        $_GET['errorName'] = validateCategoryName($category_name);
+        if(!empty($_GET['errorName']) ){
             return 0;
         }
 
@@ -490,7 +492,7 @@
             $query .= "UPDATE categories SET image = '$new_image_name' WHERE id = $category_id;"; 
         }
         
-        $query .= "UPDATE categories SET name = '$name' WHERE id = '$category_id';"; 
+        $query .= "UPDATE categories SET name = '$category_name' WHERE id = '$category_id';"; 
         $con = connection();
         $data = mysqli_multi_query($con,$query);
         if(!$data) {

@@ -1,4 +1,4 @@
-Here’s a more professional version of your README file:
+To add the live link of the website to your README file, here's the updated version:
 
 ---
 
@@ -9,6 +9,10 @@ Welcome to the official repository for **Q&A Hub**! This repository contains the
 ## Description
 
 **Q&A Hub** is a multi-authenticated, user-friendly question-and-answer platform designed to foster knowledge sharing and community engagement. Users can effortlessly ask questions, provide insightful answers, and explore a wide range of categories tailored to their interests. Whether you’re seeking advice, sharing expertise, or simply browsing topics, Q&A Hub offers a space for everyone to connect and learn.
+
+## Live Demo
+
+Check out the live version of **Q&A Hub** here: [Q&A Hub Live](http://qahub.infinityfreeapp.com)
 
 ## Key Features
 
@@ -70,5 +74,3 @@ Feel free to explore the codebase to learn more about the architecture and confi
 Thank you for your interest in **Q&A Hub**!
 
 ---
-
-This version maintains professionalism while providing clear instructions and information about the project.

@@ -1,7 +1,3 @@
-To add the live link of the website to your README file, here's the updated version:
-
----
-
 # Q&A Hub Repository
 
 Welcome to the official repository for **Q&A Hub**! This repository contains the source code and assets for our vibrant and engaging Q&A platform.

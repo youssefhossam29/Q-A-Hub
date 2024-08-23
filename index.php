@@ -1,3 +1,18 @@
+<?php 
+
+    session_start();
+    if(isset($_SESSION['userdata'])){
+        if($_SESSION['userdata']['admin'] == 0){
+            header("LOCATION:src/pages/user/home.php");
+            die;
+        }
+        else{
+            header("LOCATION:src/pages/admin/home.php");
+        }
+    }
+?>
+
+
 <!DOCTYPE html>
 <head>
 

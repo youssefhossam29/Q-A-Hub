@@ -1,5 +1,16 @@
 <?php
 
+    session_start();
+    if(isset($_SESSION['userdata'])){
+        if($_SESSION['userdata']['admin'] == 0){
+            header("LOCATION:../user/home.php");
+            die;
+        }
+        else{
+            header("LOCATION:../admin/home.php");
+        }
+    }
+
     include '../../../assets/layout.php'; 
     include '../../functions/authFunctions.php';
 

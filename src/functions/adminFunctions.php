@@ -237,7 +237,7 @@
         if(!$result) {
             header("Location:./showQuestion.php?question_slug=$question_slug&errorMessage=Could not delete Question");
         }else{
-            header("Location:./allQuestion.php?successMessage=Question deleted successfully");
+            header("Location:./allQuestions.php?successMessage=Question deleted successfully");
         }
     }
 

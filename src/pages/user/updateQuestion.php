@@ -7,25 +7,37 @@
     include '../../../assets/layout.php'; 
     include '../../functions/userFunctions.php';
 
+    if(isset($_SESSION['successMessage'])){
+        echo '<div class="container mt-4 d-flex justify-content-center">
+        <div class="alert alert-success col-md-6 text-center">' . $_SESSION['successMessage'] . '</div></div>';
+        unset($_SESSION['successMessage']);
+    }
     
-    $question_slug = isset($_GET['question_slug']) ? ($_GET['question_slug']) : null;
-    if(!canUserModifyquestion($question_slug)){
-        header("Location:./allquestions.php?errorMessage=Un Authorized");
+    if(isset($_SESSION['errorMessage'])){
+        echo '<div class="container mt-4 d-flex justify-content-center">
+        <div class="alert alert-danger col-md-6 text-center">' . $_SESSION['errorMessage'] . '</div></div>';
+        unset($_SESSION['errorMessage']);
     }
 
-    if(isset($_GET['successMessage'])) {
-        echo '<div class="container mt-4 d-flex justify-content-center">
-        <div class="alert alert-success col-md-6 text-center">' . $_GET['successMessage'] . '</div> </div>';
-    } 
-
-    if(isset($_GET['errorMessage'])) {
-        echo '<div class="container mt-4 d-flex justify-content-center">
-        <div class="alert alert-danger col-md-6 text-center">' . $_GET['errorMessage'] . '</div> </div>';
-    } 
-
+    
+    $question_slug = isset($_GET['question_slug']) ? ($_GET['question_slug']) : null;
+    
+    if ( $question_slug == null) {
+        $_SESSION['errorMessage'] = "Invalid Question";
+        $redirectUrl = isset($_SERVER['HTTP_REFERER'])? $_SERVER['HTTP_REFERER'] : "allQuestions.php";
+        header("Location: $redirectUrl");            
+        die;
+    }
+    
     $question = showQuestion($question_slug);  
+    if($question['author_id'] != $_SESSION['userdata']['id']){
+        $_SESSION['errorMessage'] = "Un Authorized";
+        $redirectUrl = isset($_SERVER['HTTP_REFERER'])? $_SERVER['HTTP_REFERER'] : "showQuestion.php?question_slug=$question_slug";
+        header("Location: $redirectUrl");            
+        die;
+    }
+
     $categories = getCategoriesInfo();
-  
     $title = isset($_POST['title'])? $_POST['title']: $question['title'];
     $image = isset($_FILES['image'])? $_FILES['image']: null;
     $content = isset($_POST['content'])? $_POST['content']: $question['content'];
@@ -103,6 +115,9 @@
 
                         <div class="form-group">
                             <input type="submit" class="btn btn-primary" value="Update Question">
+                            <a class="btn btn-secondary" href="showQuestion.php?question_slug=<?= $question_slug; ?>">
+                                    Back
+                            </a>
                         </div>
                     </form>
                 </div>

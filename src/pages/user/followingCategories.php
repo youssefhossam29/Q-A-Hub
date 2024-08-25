@@ -9,15 +9,17 @@
     include '../../functions/userFunctions.php';
 
 
-    if(isset($_GET['successMessage'])) {
+    if(isset($_SESSION['successMessage'])){
         echo '<div class="container mt-4 d-flex justify-content-center">
-        <div class="alert alert-success col-md-6 text-center">' . $_GET['successMessage'] . '</div> </div>';
-    } 
-
-    if(isset($_GET['errorMessage'])) {
+        <div class="alert alert-success col-md-6 text-center">' . $_SESSION['successMessage'] . '</div></div>';
+        unset($_SESSION['successMessage']);
+    }
+    
+    if(isset($_SESSION['errorMessage'])){
         echo '<div class="container mt-4 d-flex justify-content-center">
-        <div class="alert alert-danger col-md-6 text-center">' . $_GET['errorMessage'] . '</div> </div>';
-    } 
+        <div class="alert alert-danger col-md-6 text-center">' . $_SESSION['errorMessage'] . '</div></div>';
+        unset($_SESSION['errorMessage']);
+    }
     
 
     $start = 0;
@@ -35,6 +37,7 @@
 
     if($number_of_categories > 0){
         $number_of_pages = ceil($number_of_categories / $rows_per_page);
+        $followed_categories_ids = isset($_SESSION['followedCategoriesIds'])? $_SESSION['followedCategoriesIds']:[];
     }  
             
 ?>
@@ -67,8 +70,10 @@
                         <a href="showCategoryQuestions.php?category_id=<?php echo $category['id']; ?>" > 
                             <h5 class="card-title mb-0"><?= ($category['name']); ?></h5>
                         </a>
-                        <?php if($user_id == $_SESSION['userdata']['id']): ?>
-                            <a href="unfollowCategory.php?category_id=<?php echo $category['id']; ?>" class="btn btn-danger btn-sm">Unfollow</a>
+                        <?php if (in_array($category['id'], $followed_categories_ids)): ?>
+                            <a href="unfollowCategory.php?category_id=<?php echo $category['id']; ?>" class="btn btn-danger"><i class="fa-solid fa-minus"></i> Unfollow</a>
+                        <?php else: ?>
+                            <a href="followCategory.php?category_id=<?php echo $category['id']; ?>" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Follow</a>
                         <?php endif; ?>
                     </div>
                     <img src="../../../public/uploads/categories/<?= $category['image']; ?>" class="mx-auto" width="150px" alt="">

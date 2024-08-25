@@ -125,12 +125,15 @@
             $_SESSION['userdata'] = $result;
             if($result['admin'] == 1){
                 header("Location:../admin/home.php");
+                exit;
             }else{
                 header("Location:../user/home.php");
+                exit;
             }
-
         }else{
-            header("Location:register.php?errorMessage=Could not create account");
+            $_SESSION['errorMessage'] = "Can't create account";
+            header("Location:register.php");
+            exit;
         } 
     }
 
@@ -159,6 +162,7 @@
             $_SESSION['userdata'] = $result;
             if($result['admin'] == 1){
                 header("Location:../admin/home.php");
+                exit;
             }else{
                 $user_id = $result['id'];
                 $query = "SELECT category_id FROM users_categories WHERE user_id = $user_id;"; 
@@ -170,9 +174,12 @@
                     $_SESSION['followedCategoriesIds'] =  $followedCategoriesIds;
                 }
                 header("Location:../user/home.php");
+                exit;
             }        
         }else{
-            header("Location:login.php?errorMessage= These credentials do not match our records.");
+            $_SESSION['errorMessage'] = "These credentials do not match our records";
+            header("Location:login.php"); 
+            exit;       
         } 
     }
 
@@ -196,10 +203,13 @@
         $result = mysqli_affected_rows($con);
 
         if(!$result) {
-            header("Location:./allUsers.php?errorMessage=Could not create new admin");
-
+            $_SESSION['errorMessage'] = "Can't create new admin";
+            header("Location: createAdmin.php");
+            exit;
         }else{
-            header("Location:./allUsers.php?successMessage=Admin created successfully");
+            $_SESSION['successMessage'] = "Admin created successfully";
+            header("Location: allUsers.php");
+            exit;
         }
     }
 
@@ -225,8 +235,9 @@
 
             $new_image_name = uploadImage($image, "../../../public/uploads/users/");
             if(!$new_image_name){
-                header("Location:./updateProfile.php?errorMessage=Could not upload the image");
-                die;
+                $_SESSION['errorMessage'] = "Can't update your Profile";
+                header("Location:updateProfile.php");
+                exit;
             }
             $query .= "UPDATE users SET photo = '$new_image_name' WHERE id = '$user_id';"; 
         }
@@ -249,10 +260,14 @@
             $_SESSION['userdata']['email'] = $email;
             $_SESSION['userdata']['photo'] = isset($new_image_name)? $new_image_name: $_SESSION['userdata']['photo'];
             $_SESSION['userdata']['gender'] = $gender;
-            $_SESSION['userdata']['admin'] = $_SESSION['userdata']['admin'];            
-            header("Location:./updateProfile.php?successMessage=Profile updated successfully");
+            $_SESSION['userdata']['admin'] = $_SESSION['userdata']['admin']; 
+            $_SESSION['successMessage'] = "Your Profile updated successfully";           
+            header("Location:updateProfile.php");          
+            exit;
         }else{
-            header("Location:./updateProfile.php?errorMessage=Could not update Profile");
+            $_SESSION['errorMessage'] = "Can't update your Profile";
+            header("Location:updateProfile.php");  
+            exit;      
         }
     }
 
@@ -263,6 +278,7 @@
             setcookie(session_name(), '', time()-42000, '/');
         }
         header("LOCATION:../auth/login.php");
+        exit;
     }
 
 ?>

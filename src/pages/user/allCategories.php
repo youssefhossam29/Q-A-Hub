@@ -7,16 +7,18 @@
     include '../../../assets/layout.php'; 
     include '../../functions/userFunctions.php';
 
-    if(isset($_GET['successMessage'])) {
+    if(isset($_SESSION['successMessage'])){
         echo '<div class="container mt-4 d-flex justify-content-center">
-        <div class="alert alert-success col-md-6 text-center">' . $_GET['successMessage'] . '</div> </div>';
-    } 
+        <div class="alert alert-success col-md-6 text-center">' . $_SESSION['successMessage'] . '</div></div>';
+        unset($_SESSION['successMessage']);
+    }
+    
+    if(isset($_SESSION['errorMessage'])){
+        echo '<div class="container mt-4 d-flex justify-content-center">
+        <div class="alert alert-danger col-md-6 text-center">' . $_SESSION['errorMessage'] . '</div></div>';
+        unset($_SESSION['errorMessage']);
+    }
 
-    if(isset($_GET['errorMessage'])) {
-        echo '<div class="container mt-4 d-flex justify-content-center">
-        <div class="alert alert-danger col-md-6 text-center">' . $_GET['errorMessage'] . '</div> </div>';
-    }  
- 
     $start = 0;
     $rows_per_page = 6;
     if(isset($_GET['page-nr'])){

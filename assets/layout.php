@@ -7,10 +7,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         .text-center img {max-width: 50px;}
-        .nav-item1{border-right: 1px solid #ddd;}
-        .nav-link {color: #333; padding: 10px 15px; border: none; background-color: transparent;}
-        .question-item {margin-left:62px;padding: 15px; border-radius: 15px; text-align: center;}
-        .question-item img {width: 80px; height: 80px; border-radius: 10px;}
     </style>
 </head>
 <body>  

@@ -35,10 +35,12 @@
                     <form method="POST" action="login.php">
 
                         <div class="card-title">
-                            <?php 
-                                if(isset($_GET['errorMessage'])) {
-                                echo '<div class="alert alert-danger" role="alert">'.  $_GET["errorMessage"] .' </div>'; 
-                                } 
+                            <?php  
+                                if(isset($_SESSION['errorMessage'])){
+                                    echo '<div class="container mt-4 d-flex justify-content-center">
+                                    <div class="alert alert-danger col-md-10 text-center">' . $_SESSION['errorMessage'] . '</div></div>';
+                                    unset($_SESSION['errorMessage']);
+                                }
                             ?>
                         </div>
                         

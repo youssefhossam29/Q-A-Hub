@@ -7,8 +7,21 @@
 
     include '../../functions/adminFunctions.php';
 
-    $answer_id = isset($_GET['answer_id']) ? $_GET['answer_id'] : null; 
+    $answer_id = isset($_GET['answer_id']) ? intval($_GET['answer_id']) : 0;
     $question_slug = isset($_GET['question_slug']) ? $_GET['question_slug'] : null; 
-    deleteAnswer($answer_id, $question_slug);
+
+    if ($question_slug == null) {
+        $_SESSION['errorMessage'] = "Answer not found";
+        $redirectUrl = isset($_SERVER['HTTP_REFERER'])? $_SERVER['HTTP_REFERER'] : "allQuestions.php";
+        header("Location: $redirectUrl");            
+        die;
+    }elseif($answer_id <= 0){
+        $_SESSION['errorMessage'] = "Answer not found";
+        $redirectUrl = isset($_SERVER['HTTP_REFERER'])? $_SERVER['HTTP_REFERER'] : "showQuestionAnswers.php?question_slug=$question_slug";
+        header("Location: $redirectUrl");            
+        die;
+    }else{
+        deleteAnswer($answer_id, $question_slug);
+    }
 
 ?>

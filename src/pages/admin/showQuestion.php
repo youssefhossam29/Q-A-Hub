@@ -7,6 +7,19 @@
 
     include '../../../assets/layout.php'; 
     include '../../functions/adminFunctions.php';
+
+    if(isset($_SESSION['successMessage'])){
+        echo '<div class="container mt-4 d-flex justify-content-center">
+        <div class="alert alert-success col-md-6 text-center">' . $_SESSION['successMessage'] . '</div></div>';
+        unset($_SESSION['successMessage']);
+    }
+    
+    if(isset($_SESSION['errorMessage'])){
+        echo '<div class="container mt-4 d-flex justify-content-center">
+        <div class="alert alert-danger col-md-6 text-center">' . $_SESSION['errorMessage'] . '</div></div>';
+        unset($_SESSION['errorMessage']);
+    }
+    
     $question_slug = isset($_GET['question_slug']) ? ($_GET['question_slug']) : null;
     $question = showQuestion($question_slug);
 ?>

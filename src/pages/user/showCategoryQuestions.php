@@ -9,18 +9,18 @@
     include '../../functions/userFunctions.php';
 
 
-    if(isset($_GET['successMessage'])) {
+    if(isset($_SESSION['successMessage'])){
         echo '<div class="container mt-4 d-flex justify-content-center">
-        <div class="alert alert-success col-md-6 text-center">' . $_GET['successMessage'] . '</div> </div>';
-    } 
-
-    if(isset($_GET['errorMessage'])) {
+        <div class="alert alert-success col-md-6 text-center">' . $_SESSION['successMessage'] . '</div></div>';
+        unset($_SESSION['successMessage']);
+    }
+    
+    if(isset($_SESSION['errorMessage'])){
         echo '<div class="container mt-4 d-flex justify-content-center">
-        <div class="alert alert-danger col-md-6 text-center">' . $_GET['errorMessage'] . '</div> </div>';
-    } 
+        <div class="alert alert-danger col-md-6 text-center">' . $_SESSION['errorMessage'] . '</div></div>';
+        unset($_SESSION['errorMessage']);
+    }
  
-
-    $category_id = isset($_GET['category_id']) ? intval($_GET['category_id']) : 0;
 
     $start = 0;
     $rows_per_page = 3;
@@ -29,6 +29,7 @@
         $start = $page * $rows_per_page;
     }
 
+    $category_id = isset($_GET['category_id']) ? intval($_GET['category_id']) : 0;
     $data = showCategoryQuestions($category_id, $start, $rows_per_page); 
     $category = $data['category'];
     $questions = $data['questions'];

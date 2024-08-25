@@ -9,14 +9,16 @@
         include '../../../assets/layout.php'; 
         include '../../functions/userFunctions.php';
 
-        if(isset($_GET['successMessage'])) {
+        if(isset($_SESSION['successMessage'])){
             echo '<div class="container mt-4 d-flex justify-content-center">
-            <div class="alert alert-success col-md-6 text-center">' . $_GET['successMessage'] . '</div> </div>';
-        } 
-
-        if(isset($_GET['errorMessage'])) {
+            <div class="alert alert-success col-md-6 text-center">' . $_SESSION['successMessage'] . '</div></div>';
+            unset($_SESSION['successMessage']);
+        }
+        
+        if(isset($_SESSION['errorMessage'])){
             echo '<div class="container mt-4 d-flex justify-content-center">
-            <div class="alert alert-danger col-md-6 text-center">' . $_GET['errorMessage'] . '</div> </div>';
+            <div class="alert alert-danger col-md-6 text-center">' . $_SESSION['errorMessage'] . '</div></div>';
+            unset($_SESSION['errorMessage']);
         } 
 
         $user = $_SESSION['userdata']; 
@@ -33,6 +35,13 @@
     ?>
 
     <div class="container" style="margin-bottom: 80px;">
+        <?php         
+            if (sizeof($questions) == 0) {
+                echo '<div class="container mt-4 d-flex justify-content-center">
+                <div class="alert alert-danger col-md-6 text-center"> There is no Questions yet</div> </div>';
+                die;
+            }
+        ?>
         <div class="card-header">
             <ul class="nav nav-tabs card-header-tabs">
                 <li class="nav-item">
@@ -41,14 +50,6 @@
             </ul> 
         </div>
         <div class="card-body">
-            <?php         
-                if (sizeof($questions) == 0) {
-                    echo '<div class="container mt-4 d-flex justify-content-center">
-                    <div class="alert alert-danger col-md-6 text-center"> There is no Questions</div> </div>';
-                    die;
-                }
-            ?>
-
             <div class="row">
                 <?php foreach($questions as $question): ?>
                     <div class="col-lg-4 col-md-6 mb-4">

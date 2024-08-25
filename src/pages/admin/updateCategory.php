@@ -8,6 +8,18 @@
     include '../../functions/authFunctions.php';
     include '../../../assets/layout.php'; 
 
+    if(isset($_SESSION['successMessage'])){
+        echo '<div class="container mt-4 d-flex justify-content-center">
+        <div class="alert alert-success col-md-6 text-center">' . $_SESSION['successMessage'] . '</div></div>';
+        unset($_SESSION['successMessage']);
+    }
+    
+    if(isset($_SESSION['errorMessage'])){
+        echo '<div class="container mt-4 d-flex justify-content-center">
+        <div class="alert alert-danger col-md-6 text-center">' . $_SESSION['errorMessage'] . '</div></div>';
+        unset($_SESSION['errorMessage']);
+    }
+
     $category_id = isset($_GET['category_id']) ? intval($_GET['category_id']) : 0;
     $category = showCategory($category_id); 
     $name = isset($_POST['name'])? $_POST['name']: $category['name'];

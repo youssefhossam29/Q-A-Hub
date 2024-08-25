@@ -48,12 +48,15 @@
                 }
             }while (mysqli_next_result($con));
         }else{
-            header("Location:./home.php?errorMessage=Can't select Data");
-            die;
+            $con->close();
+            $_SESSION['errorMessage'] = "Can't reload Home page";
+            $redirectUrl = isset($_SERVER['HTTP_REFERER'])? $_SERVER['HTTP_REFERER']:"allCategories.php";
+            header("Location: $redirectUrl");
         }
         $con->close();
         return ["latest_questions" => $data[0], "most_followed_categories" => $data[1], 
-                "most_question_categories" => $data[2], "followed_questions" => $data[3]] ;  
+                "most_question_categories" => $data[2], "followed_questions" => $data[3]
+                ] ;  
     }
 
 
@@ -71,13 +74,14 @@
         $con = connection();
         $data = mysqli_query($con,$query);
         $result = mysqli_affected_rows($con);
-        if(!$result) {
-            header("Location:./home.php?errorMessage=Could not select data of Questions");
-            die;
-        }
-        $questions = mysqli_fetch_all($data, MYSQLI_ASSOC);
         $con->close();
-        return $questions;
+
+        if(!$result) {
+            return [];
+        }else{
+            $questions = mysqli_fetch_all($data, MYSQLI_ASSOC);
+            return $questions;
+        }
     } 
 
 
@@ -99,7 +103,8 @@
             }
             $new_image_name = uploadFile($image, "../../../public/uploads/questions/");
             if(!$new_image_name){
-                header("Location:./showQuestion.php?question_slug=$question_slug&errorMessage=Can't upload new image");
+                $_SESSION['errorMessage'] = "Can't create Question";
+                header("Location:addQuestion.php");
                 die;
             }
         }
@@ -114,12 +119,13 @@
         $con->close();
 
         if(!$result) {
-            header("Location:./addQuestion.php?errorMessage=Can't create new Question");
+            $_SESSION['errorMessage'] = "Can't create Question";
+            header("Location:addQuestion.php");
         }else{
-            header("Location:./showUser.php?user_id=$author_id&successMessage=Question created successfully");
+            $_SESSION['successMessage'] = "Question created successfully";
+            header("Location:./showUser.php?user_id=$author_id");
         }
     }
-
 
 
     function updateQuestion($question_slug, $title, $content, $image, $category_id){
@@ -141,7 +147,8 @@
 
             $new_image_name = uploadFile($image, "../../../public/uploads/questions/");
             if(!$new_image_name){
-                header("Location:./showQuestion.php?question_slug=$question_slug&errorMessage=Can't upload new image");
+                $_SESSION['errorMessage'] = "Can't update your Question";
+                header("Location:updateQuestion.php?question_slug=$question_slug");
                 die;
             }
             
@@ -151,12 +158,14 @@
         $query .= "UPDATE questions SET title = '$title', content = \"$content\", category_id = '$category_id' WHERE slug = '$question_slug';"; 
         $con = connection();
         $data = mysqli_multi_query($con,$query);
-        $result = mysqli_affected_rows($con);
-        if(!$result) {
-            header("Location:./showQuestion.php?question_slug=$question_slug&errorMessage=Can't update Your Question");
+        $con->close();
+
+        if(!$data) {
+            $_SESSION['errorMessage'] = "Can't update your Question";
         }else{
-            header("Location:./showQuestion.php?question_slug=$question_slug&successMessage=Question updated successfully");
+            $_SESSION['successMessage'] = "Question updated successfully";
         }
+        header("Location:updateQuestion.php?question_slug=$question_slug");
     }
 
 
@@ -231,10 +240,11 @@
 
     function showUserQuestions($user_id, $start, $rows_per_page){
         if ($user_id <= 0) {
-            header("Location:./home.php?errorMessage=Can't select data of user");
+            $_SESSION['errorMessage'] = "User not found";
+            $redirectUrl = isset($_SERVER['HTTP_REFERER'])? $_SERVER['HTTP_REFERER']:"home.php";
+            header("Location: $redirectUrl");
             die;
         }
-
 
         $query = " SELECT u.id, u.name, u.photo, COUNT(DISTINCT b.id) AS total_questions, COUNT(DISTINCT uc.category_id) AS number_of_followed_categories
                     FROM users u
@@ -251,7 +261,6 @@
                     LIMIT $start, $rows_per_page;
                 ";
 
-
         $con = connection();
         $data = []; 
         if (mysqli_multi_query($con, $query)){
@@ -263,7 +272,17 @@
                 }
             }while (mysqli_next_result($con));
         }else{
-            header("Location:./home.php?errorMessage=Can't select Questions of User");
+            $con->close();
+            $_SESSION['errorMessage'] = "User not found";
+            $redirectUrl = isset($_SERVER['HTTP_REFERER'])? $_SERVER['HTTP_REFERER']:"home.php";
+            header("Location: $redirectUrl");
+            die;
+        }
+
+        if(empty($data[0][0]['id'])){
+            $_SESSION['errorMessage'] = "User not found";
+            $redirectUrl = isset($_SERVER['HTTP_REFERER'])? $_SERVER['HTTP_REFERER']:"home.php";
+            header("Location: $redirectUrl");
             die;
         }
         $con->close();
@@ -273,7 +292,9 @@
 
     function showQuestion($question_slug){
         if ( $question_slug == null) {
-            header("Location:./allCategories.php?errorMessage=invalid Question");
+            $_SESSION['errorMessage'] = "Can't select data of Question";
+            $redirectUrl = isset($_SERVER['HTTP_REFERER'])? $_SERVER['HTTP_REFERER'] : "allQuestions.php";
+            header("Location: $redirectUrl");
             die;
         }
 
@@ -287,30 +308,33 @@
         $con = connection();
         $data = mysqli_query($con,$query);
         $result = mysqli_affected_rows($con);
+        $con->close();
+
         if(!$result) {
-            header("Location:./allCategories.php?errorMessage=Can't select data of Question");
+            $_SESSION['errorMessage'] = "Can't select data of Question";
+            $redirectUrl = isset($_SERVER['HTTP_REFERER'])? $_SERVER['HTTP_REFERER'] : "allQuestions.php";
+            header("Location: $redirectUrl");
             die;
         }
         $question = mysqli_fetch_assoc($data);
-        $con->close();
         return $question;
     }
 
 
     function deleteQuestion($question_slug){
-        if ( $question_slug == null) {
-            header("Location:./allCategories.php?errorMessage=invalid Question");
-            die;
-        }
         $con = connection();
         $query = "DELETE FROM questions WHERE slug = '$question_slug' ";
         mysqli_query($con,$query);
         $result = mysqli_affected_rows($con);
         $con->close();
         if(!$result) {
-            header("Location:./showQuestion.php?question_slug=$question_slug&errorMessage=Could not delete Question");
+            $_SESSION['errorMessage'] = "Can't delete Question";
+            $redirectUrl = isset($_SERVER['HTTP_REFERER'])? $_SERVER['HTTP_REFERER'] : "showQuestion.php?question_slug=$question_slug";
+            header("Location: $redirectUrl");
+            die;
         }else{
             $user_id = $_SESSION['userdata']['id'];
+            $_SESSION['successMessage'] = "Question deleted successfully";
             header("Location:./showUser.php?user_id=$user_id&successMessage=Question deleted successfully");
         }
     }
@@ -318,13 +342,7 @@
 
 
     // Answers 
-    function createAnswer($question_id, $question_slug, $content){
-
-        if( empty($content) || $question_slug == null || $question_id == null){
-            header("Location:./showQuestionAnswers.php?question_slug=$question_slug&errorMessage=Can't add Answer");
-            die;
-        }
-        
+    function createAnswer($question_id, $question_slug, $content){    
         $author_id = $_SESSION['userdata']['id']; 
         $query = "INSERT INTO answers (author_id,question_id,content) VALUES ('$author_id', '$question_id','$content')"; 
         $con = connection();
@@ -333,14 +351,22 @@
         $con->close();
 
         if(!$result) {
-            header("Location:./showQuestionAnswers.php?question_slug=$question_slug&errorMessage=Can't add Answer");
+            $_SESSION['errorMessage'] = "Can't add Answer";
         }else{
-            header("Location:./showQuestionAnswers.php?question_slug=$question_slug&successMessage=Answer Added successfully");
+            $_SESSION['successMessage'] = "Answer Added successfully";
         }
+        header("Location:showQuestionAnswers.php?question_slug=$question_slug");
     }
 
 
     function showQuestionAnswers($question_slug, $start, $rows_per_page){
+        if ( $question_slug == null) {
+            $_SESSION['errorMessage'] = "Can't select answers of Question";
+            $redirectUrl = isset($_SERVER['HTTP_REFERER'])? $_SERVER['HTTP_REFERER'] : "allQuestions.php";
+            header("Location: $redirectUrl");
+            die;
+        }
+
         $query = "SELECT b.id AS question_id, b.title AS question_title, b.slug AS question_slug, COUNT(c.id) AS total_answers
                     FROM questions b
                     LEFT JOIN answers c ON b.id = c.question_id
@@ -367,17 +393,25 @@
                 }
             }while (mysqli_next_result($con));
         }else{
-            header("Location:./showQuestion.php?question_slug=$question_slug&errorMessage=Can't select Answers");
+            $_SESSION['errorMessage'] = "Can't select answers";
+            $redirectUrl = isset($_SERVER['HTTP_REFERER'])? $_SERVER['HTTP_REFERER'] : "showQuestion.php?question_slug=$question_slug";
+            header("Location: $redirectUrl");
             die;
         }
         $con->close();
-        return ["question" =>$data[0][0], "answers" =>$data[1]]; 
+        if(empty($data[0])){
+            $_SESSION['errorMessage'] = "Can't select answers";
+            $redirectUrl = isset($_SERVER['HTTP_REFERER'])? $_SERVER['HTTP_REFERER'] : "allQuestions.php";
+            header("Location: $redirectUrl");
+            die;          
+        }
+        return ["question" =>$data[0][0], "answers" =>$data[1]];
     }
 
 
     function canUserModifyAnswer($answer_id){
         $author_id = $_SESSION['userdata']['id'];
-        $query = "SELECT * FROM answers WHERE id = '$answer_id' AND author_id = '$author_id' ;";
+        $query = "SELECT * FROM answers WHERE id = '$answer_id' AND author_id = '$author_id' LIMIT 1;";
         $con = connection();
         $data = mysqli_query($con,$query);
         $result = mysqli_affected_rows($con);
@@ -387,32 +421,27 @@
             return 0;
         }else{
             return 1;
-        } 
+        }   
     }
 
 
     function updateAnswer($answer_id, $content, $question_slug){
-        if ( $answer_id == 0 || $question_slug == null) {
-            header("Location:showQuestionAnswers.php?question_slug=$question_slug&errorMessage=Can't delete Answer");
-        }
         $query = "UPDATE answers SET content = '$content' WHERE id = '$answer_id';";
         $con = connection();
         $data = mysqli_query($con,$query);
-        $result = mysqli_affected_rows($con);
         $con->close();
 
-        if(!$result) {
-            header("Location:showQuestionAnswers.php?question_slug=$question_slug&errorMessage=Can't update Answer");
+        if(!$data) {
+            $_SESSION['errorMessage'] = "Can't update your Answer";
         }else{
-            header("Location:showQuestionAnswers.php?question_slug=$question_slug&successMessage=Answer updated successfully");
+            $_SESSION['successMessage'] = "Your answer updated successfully";
         }
+        $redirectUrl = isset($_SERVER['HTTP_REFERER'])? $_SERVER['HTTP_REFERER'] : "showQuestionAnswers.php?question_slug=$question_slug";
+        header("Location: $redirectUrl");
     }
 
 
     function deleteAnswer($answer_id, $question_slug){
-        if ( $answer_id == 0 || $question_slug == null) {
-            header("Location:showQuestionAnswers.php?question_slug=$question_slug&errorMessage=Can't delete Answer");
-        }
         $con = connection();
         $query = "DELETE FROM answers WHERE id = '$answer_id' ";
         $data = mysqli_query($con,$query);
@@ -420,40 +449,50 @@
         $con->close();
 
         if(!$result) {
-            header("Location:showQuestionAnswers.php?question_slug=$question_slug&errorMessage=Can't delete answer");
+            $_SESSION['errorMessage'] = "Can't delete your Answer";
         }else{
-            header("Location:showQuestionAnswers.php?question_slug=$question_slug&successMessage=answer deleted successfully");
+            $_SESSION['successMessage'] = "Your answer deleted successfully";
         }
+        $redirectUrl = isset($_SERVER['HTTP_REFERER'])? $_SERVER['HTTP_REFERER'] : "showQuestionAnswers.php?question_slug=$question_slug";
+        header("Location: $redirectUrl");
     }
 
 
-
     function showAnswer($answer_id, $question_slug){
-        $query = "SELECT b.title AS question_title, b.id AS question_id, b.slug AS question_slug, c.id AS answer_id, c.content AS answer_content
+        $user_id = $_SESSION['userdata']['id'];
+        $query = "SELECT b.title AS question_title, b.id AS question_id, b.slug AS question_slug, a.id AS answer_id, a.content AS answer_content, a.author_id AS author_id
                   FROM questions b
-                  JOIN answers c ON b.id = c.question_id
-                  WHERE  c.id = '$answer_id';
+                  JOIN answers a ON b.id = a.question_id
+                  WHERE  a.id = $answer_id AND a.author_id = $user_id
+                  LIMIT 1;
                 ";
 
         $con = connection();
         $data = mysqli_query($con,$query);
         $result = mysqli_affected_rows($con);
+        $con->close();
 
         if(!$result) {
-            header("Location:./showQuestionAnswers.php?question_slug=$question_slug&errorMessage=Can't add Answer");
+            $_SESSION['errorMessage'] = "Un Authorized";
+            $redirectUrl = isset($_SERVER['HTTP_REFERER'])? $_SERVER['HTTP_REFERER'] : "showQuestionAnswers.php?question_slug=$question_slug";
+            header("Location: $redirectUrl");
         }
 
         $answer = mysqli_fetch_assoc($data);
-        $con->close();
-        return $answer;
+        if($answer['question_slug'] != $question_slug ){
+            $_SESSION['errorMessage'] = "Un Authorized";
+            $redirectUrl = isset($_SERVER['HTTP_REFERER'])? $_SERVER['HTTP_REFERER'] : "allQuestions.php";
+            header("Location: $redirectUrl");
+            die;
+        }else{
+            return $answer;
+        }
     }
 
 
 
     // Categories functions
     function showCategories($start, $rows_per_page, $type = "Latest"){
-        $con = connection();
-
         $query = "SELECT c.*, COUNT(*) OVER() AS total_categories, COUNT(DISTINCT uc.user_id) AS total_followers, COUNT(DISTINCT b.id) AS total_questions
                   FROM categories c 
                   LEFT JOIN users_categories uc ON c.id = uc.category_id
@@ -478,18 +517,20 @@
                 die("Error");
         }
 
+        $con = connection();
         $data = mysqli_query($con,$query);
         $result = mysqli_affected_rows($con);  
-       
+        $con->close();
+
         if(!$result) {
-            header("Location:./home.php?errorMessage=invalid Category");
+            $_SESSION['errorMessage'] = "Can't select Categories";
+            $redirectUrl = isset($_SERVER['HTTP_REFERER'])? $_SERVER['HTTP_REFERER'] : "home.php";
+            header("Location: $redirectUrl");
             die;        
         }
         $categories = mysqli_fetch_all($data, MYSQLI_ASSOC);
-        $con->close();
         return $categories;
     } 
-
 
 
     function getCategoriesInfo(){
@@ -499,7 +540,7 @@
         $data = mysqli_query($con,$query);
         $result = mysqli_affected_rows($con);
         if(!$result) {
-            return null;
+            return [];
         }
         $categories = mysqli_fetch_all($data, MYSQLI_ASSOC);
         $con->close();
@@ -508,8 +549,10 @@
 
 
     function showCategoryQuestions($category_id, $start, $rows_per_page){
-        if ( $category_id == 0) {
-            header("Location:./allCategories.php?errorMessage=Can't select questions of Category");
+        if ($category_id <= 0) {
+            $_SESSION['errorMessage'] = "Invalid Category";
+            $redirectUrl = isset($_SERVER['HTTP_REFERER'])? $_SERVER['HTTP_REFERER'] : "allCategories.php";
+            header("Location: $redirectUrl");            
             die;
         }
 
@@ -539,17 +582,27 @@
                 }
             }while (mysqli_next_result($con));
         }else{
-            header("Location:./allCategories.php?errorMessage=Can't select questions of Category");
+            $_SESSION['errorMessage'] = "Can't select questions of Category";
+            $redirectUrl = isset($_SERVER['HTTP_REFERER'])? $_SERVER['HTTP_REFERER'] : "allCategories.php";
+            header("Location: $redirectUrl");
             die;
         }
         $con->close();
+        if(empty($data[0])){
+            $_SESSION['errorMessage'] = "Invalid Category";
+            $redirectUrl = isset($_SERVER['HTTP_REFERER'])? $_SERVER['HTTP_REFERER'] : "allCategories.php";
+            header("Location: $redirectUrl");
+            die;          
+        }
         return ["category" =>$data[0][0], "questions" =>$data[1]];
     }
 
 
     function showCategoryFollowers($category_id, $start, $rows_per_page){
-        if ( $category_id == 0) {
-            header("Location:./allCategories.php?errorMessage=Can't select questions of Category");
+        if ($category_id <= 0) {
+            $_SESSION['errorMessage'] = "Invalid Category";
+            $redirectUrl = isset($_SERVER['HTTP_REFERER'])? $_SERVER['HTTP_REFERER'] : "allCategories.php";
+            header("Location: $redirectUrl");            
             die;
         }
 
@@ -577,10 +630,18 @@
                 }
             }while (mysqli_next_result($con));
         }else{
-            header("Location:./allCategories.php?errorMessage=Can't select Questions of Category");
+            $_SESSION['errorMessage'] = "Can't select questions of Category";
+            $redirectUrl = isset($_SERVER['HTTP_REFERER'])? $_SERVER['HTTP_REFERER'] : "allCategories.php";
+            header("Location: $redirectUrl");
             die;
         }
         $con->close();
+        if(empty($data[0])){
+            $_SESSION['errorMessage'] = "Invalid Category";
+            $redirectUrl = isset($_SERVER['HTTP_REFERER'])? $_SERVER['HTTP_REFERER'] : "allCategories.php";
+            header("Location: $redirectUrl");
+            die;          
+        }
         return ["category" =>$data[0][0], "users" =>$data[1]];
     }
 
@@ -604,8 +665,10 @@
 
     // manage categories
     function followCategory($category_id) {
-        if ($category_id <= 0){
-            header("Location:./allCategories.php?errorMessage=Can't follow category");
+        if ($category_id <= 0) {
+            $_SESSION['errorMessage'] = "Can't follow category";
+            $redirectUrl = isset($_SERVER['HTTP_REFERER'])? $_SERVER['HTTP_REFERER'] : "allCategories.php";
+            header("Location: $redirectUrl");            
             die;
         }
     
@@ -614,19 +677,24 @@
         $query = "INSERT INTO users_categories (user_id, category_id) VALUES ($user_id, $category_id)";
         $data = mysqli_query($con,$query);
         $result = mysqli_affected_rows($con);
-        if(!$result) {
-            header("Location:./allCategories.php?errorMessage=Can't follow category");
-            die;
-        }
-        $_SESSION['followedCategoriesIds'] = showFollowedCategories();
         $con->close();
-        header("Location:./allCategories.php?successMessage=You've successfully followed the category");
-    }
+
+        if(!$result) {
+            $_SESSION['errorMessage'] = "Can't follow the category";
+        }else{
+            $_SESSION['followedCategoriesIds'] = getFollowedCategories();
+            $_SESSION['successMessage'] = "You've successfully follow the category";
+        }
+        $redirectUrl = isset($_SERVER['HTTP_REFERER'])? $_SERVER['HTTP_REFERER'] : "allCategories.php";
+        header("Location: $redirectUrl");
+    } 
     
     
     function unfollowCategory($category_id) {
-        if ($category_id <= 0){
-            header("Location:./allCategories.php?errorMessage=Can't unfollow category");
+        if ($category_id <= 0) {
+            $_SESSION['errorMessage'] = "Can't follow category";
+            $redirectUrl = isset($_SERVER['HTTP_REFERER'])? $_SERVER['HTTP_REFERER'] : "allCategories.php";
+            header("Location: $redirectUrl");            
             die;
         }
     
@@ -634,17 +702,20 @@
         $user_id = $_SESSION['userdata']['id'];
         $query = "DELETE FROM users_categories WHERE user_id = '$user_id' AND category_id = '$category_id';";
         $data = mysqli_query($con,$query);
+
         if(!$data) {
-            header("Location:./allCategories.php?errorMessage=Can't follow category");
-            die;
+            $_SESSION['errorMessage'] = "Can't unfollow the category";
+        }else{
+            $_SESSION['followedCategoriesIds'] = getFollowedCategories();
+            $_SESSION['successMessage'] = "You've successfully unfollow the category";
         }
-        $_SESSION['followedCategoriesIds'] = showFollowedCategories();
         $con->close();
-        header("Location:./allCategories.php?successMessage=You've successfully unfollowed the category");
+        $redirectUrl = isset($_SERVER['HTTP_REFERER'])? $_SERVER['HTTP_REFERER'] : "allCategories.php";
+        header("Location: $redirectUrl");
     }
-    
-    
-    function showFollowedCategories() {
+
+
+    function getFollowedCategories() {
         $user_id = $_SESSION['userdata']['id'];
         $query = "SELECT category_id AS id FROM users_categories WHERE user_id = $user_id;";
         $user_id = $_SESSION['userdata']['id'];
@@ -664,12 +735,13 @@
         $con->close();
         return $categories;
     }
-
-
+    
 
     function userFollowingCategories($user_id, $start, $rows_per_page){
         if ($user_id <= 0) {
-            header("Location:./home.php?errorMessage=Can't select data of user");
+            $_SESSION['errorMessage'] = "Can't select following categories of user";
+            $redirectUrl = isset($_SERVER['HTTP_REFERER'])? $_SERVER['HTTP_REFERER'] : "home.php";
+            header("Location: $redirectUrl");            
             die;
         }
 
@@ -688,7 +760,6 @@
                     LIMIT $start, $rows_per_page;
                 ";
 
-
         $con = connection();
         $data = []; 
         if (mysqli_multi_query($con, $query)){
@@ -700,10 +771,18 @@
                 }
             }while (mysqli_next_result($con));
         }else{
-            header("Location:./home.php?errorMessage=Can't select Questions of User");
+            $_SESSION['errorMessage'] = "Can't select following categories of user";
+            $redirectUrl = isset($_SERVER['HTTP_REFERER'])? $_SERVER['HTTP_REFERER'] : "showUser.php?user_id=$user_id";
+            header("Location: $redirectUrl");
             die;
         }
         $con->close();
+        if(empty($data[0][0]['id'])){
+            $_SESSION['errorMessage'] = "User not found";
+            $redirectUrl = isset($_SERVER['HTTP_REFERER'])? $_SERVER['HTTP_REFERER'] : "home.php";
+            header("Location: $redirectUrl");
+            die;          
+        }
         return ["user" =>$data[0][0], "categories" =>$data[1]];   
     }
     

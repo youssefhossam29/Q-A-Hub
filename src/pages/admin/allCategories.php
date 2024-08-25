@@ -7,15 +7,17 @@
         include '../../../assets/layout.php'; 
         include '../../functions/adminFunctions.php';
 
-        if(isset($_GET['successMessage'])) {
+        if(isset($_SESSION['successMessage'])){
             echo '<div class="container mt-4 d-flex justify-content-center">
-            <div class="alert alert-success col-md-6 text-center">' . $_GET['successMessage'] . '</div> </div>';
-        } 
-
-        if(isset($_GET['errorMessage'])) {
+            <div class="alert alert-success col-md-6 text-center">' . $_SESSION['successMessage'] . '</div></div>';
+            unset($_SESSION['successMessage']);
+        }
+        
+        if(isset($_SESSION['errorMessage'])){
             echo '<div class="container mt-4 d-flex justify-content-center">
-            <div class="alert alert-danger col-md-6 text-center">' . $_GET['errorMessage'] . '</div> </div>';
-        } 
+            <div class="alert alert-danger col-md-6 text-center">' . $_SESSION['errorMessage'] . '</div></div>';
+            unset($_SESSION['errorMessage']);
+        }
 
         $start = 0;
         $rows_per_page = 4;
@@ -26,20 +28,16 @@
 
         $type = isset($_GET['type']) ? $_GET['type'] : "Latest";
         $categories = showCategories($start, $rows_per_page, $type);
-        $number_of_rows = $categories[0]['total_categories'];
-        $number_of_pages = ceil($number_of_rows / $rows_per_page); 
+        
+        $number_of_categories = sizeof($categories);
+        if($number_of_categories > 0){
+            $number_of_categories = $categories[0]['total_categories'];
+            $number_of_pages = ceil($number_of_categories / $rows_per_page);
+        }
     ?>
 
 
 <div class="container-fluid" style="margin-bottom:80px">
-    <?php         
-        if (sizeof($categories) ==0 ) {
-            echo '<div class="container mt-4 d-flex justify-content-center">
-            <div class="alert alert-danger col-md-6 text-center"> There is no Categories</div> </div>';
-            die;
-        }
-    ?>
-
     <div class="card-header">
         <ul class="nav nav-tabs card-header-tabs" style="margin:1px">
             <li class="nav-item">
@@ -56,6 +54,14 @@
             </li>
         </ul>
     </div>
+
+    <?php         
+        if (sizeof($categories) ==0 ) {
+            echo '<div class="container mt-4 d-flex justify-content-center">
+            <div class="alert alert-danger col-md-6 text-center"> There is no Categories</div> </div>';
+            die;
+        }
+    ?>
 
     <div class="card-body">
         <table class="table table-striped">

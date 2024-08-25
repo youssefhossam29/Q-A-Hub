@@ -6,14 +6,16 @@
     include '../../../assets/layout.php'; 
     include '../../functions/userFunctions.php';
 
-    if(isset($_GET['successMessage'])) {
+    if(isset($_SESSION['successMessage'])){
         echo '<div class="container mt-4 d-flex justify-content-center">
-        <div class="alert alert-success col-md-6 text-center">' . $_GET['successMessage'] . '</div> </div>';
-    } 
-
-    if(isset($_GET['errorMessage'])) {
+        <div class="alert alert-success col-md-6 text-center">' . $_SESSION['successMessage'] . '</div></div>';
+        unset($_SESSION['successMessage']);
+    }
+    
+    if(isset($_SESSION['errorMessage'])){
         echo '<div class="container mt-4 d-flex justify-content-center">
-        <div class="alert alert-danger col-md-6 text-center">' . $_GET['errorMessage'] . '</div> </div>';
+        <div class="alert alert-danger col-md-6 text-center">' . $_SESSION['errorMessage'] . '</div></div>';
+        unset($_SESSION['errorMessage']);
     }
 
 
@@ -52,6 +54,16 @@
     .carousel-item {
         flex-wrap: wrap; 
         justify-content: center;
+    }
+    .question-item {
+        margin-left:62px;padding: 15px; 
+        border-radius: 15px; 
+        text-align: center;
+    }
+    .question-item img {
+        width: 80px; 
+        height: 80px; 
+        border-radius: 10px;
     }
 </style>
 
@@ -115,9 +127,7 @@
         <!-- latest questions-->
         <?php 
             $number_of_latest_questions = sizeof($latest_questions);
-            if ($number_of_latest_questions == 0) {
-                die;
-            }
+            if ($number_of_latest_questions > 0):
         ?>
         <div class="col-md-10" style="margin-bottom:40px">
             <br><h5 class="text-muted">Latest Questions</h5><br>
@@ -158,6 +168,7 @@
                 </a>
             </div>
         </div>
+        <?php endif; ?>
 
 
         <!-- Followed Categories Questions -->

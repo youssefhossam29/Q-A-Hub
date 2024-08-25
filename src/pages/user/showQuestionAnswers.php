@@ -8,15 +8,17 @@
     include '../../../assets/layout.php'; 
     include '../../functions/userFunctions.php';
 
-    if(isset($_GET['successMessage'])) {
+    if(isset($_SESSION['successMessage'])){
         echo '<div class="container mt-4 d-flex justify-content-center">
-        <div class="alert alert-success col-md-6 text-center">' . $_GET['successMessage'] . '</div> </div>';
-    } 
-
-    if(isset($_GET['errorMessage'])) {
+        <div class="alert alert-success col-md-6 text-center">' . $_SESSION['successMessage'] . '</div></div>';
+        unset($_SESSION['successMessage']);
+    }
+    
+    if(isset($_SESSION['errorMessage'])){
         echo '<div class="container mt-4 d-flex justify-content-center">
-        <div class="alert alert-danger col-md-6 text-center">' . $_GET['errorMessage'] . '</div> </div>';
-    } 
+        <div class="alert alert-danger col-md-6 text-center">' . $_SESSION['errorMessage'] . '</div></div>';
+        unset($_SESSION['errorMessage']);
+    }
 
     $start = 0;
     $rows_per_page = 2;
@@ -36,8 +38,6 @@
 
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $content = $_POST['answer'];
-        $question_slug = isset($_GET['question_slug']) ? ($_GET['question_slug']) : null;
-
         if (empty(trim($content))) {
             $error_content = "answer cannot be empty.";
         } else {

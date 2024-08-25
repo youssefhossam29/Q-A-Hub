@@ -8,34 +8,42 @@
     include '../../../assets/layout.php'; 
     include '../../functions/userFunctions.php';
 
-    if(isset($_GET['successMessage'])) {
+    if(isset($_SESSION['successMessage'])){
         echo '<div class="container mt-4 d-flex justify-content-center">
-        <div class="alert alert-success col-md-6 text-center">' . $_GET['successMessage'] . '</div> </div>';
-    } 
-
-    if(isset($_GET['errorMessage'])) {
+        <div class="alert alert-success col-md-6 text-center">' . $_SESSION['successMessage'] . '</div></div>';
+        unset($_SESSION['successMessage']);
+    }
+    
+    if(isset($_SESSION['errorMessage'])){
         echo '<div class="container mt-4 d-flex justify-content-center">
-        <div class="alert alert-danger col-md-6 text-center">' . $_GET['errorMessage'] . '</div> </div>';
-    } 
+        <div class="alert alert-danger col-md-6 text-center">' . $_SESSION['errorMessage'] . '</div></div>';
+        unset($_SESSION['errorMessage']);
+    }
 
+    $question_slug = isset($_GET['question_slug']) ? $_GET['question_slug'] : null;
+    $answer_id = isset($_GET['answer_id']) ? intval($_GET['answer_id']) : 0;
 
-    $answer_id = isset($_GET['answer_id']) ? intval($_GET['answer_id']) : null; 
-    $question_slug = isset($_GET['question_slug']) ? intval($_GET['question_slug']) : null; 
-    if(!canUserModifyAnswer($answer_id)){
-        header("Location:./showQuestionAnswers.php?question_slug=$question_slug&errorMessage=Un Authorized");
+    if($question_slug == null){
+        $_SESSION['errorMessage'] = "Invalid Answer";
+        $redirectUrl = isset($_SERVER['HTTP_REFERER'])? $_SERVER['HTTP_REFERER'] : "allQuestions.php";
+        header("Location: $redirectUrl");            
+        die;
+    }elseif($answer_id <= 0){
+        $_SESSION['errorMessage'] = "Invalid Answer";
+        $redirectUrl = isset($_SERVER['HTTP_REFERER'])? $_SERVER['HTTP_REFERER'] : "showQuestionAnswers.php?question_slug=$question_slug";
+        header("Location: $redirectUrl");            
         die;
     }
 
-
     $answer = showAnswer($answer_id, $question_slug); 
+
     $content = isset($_POST['content']) ? $_POST['content'] : $answer['answer_content'];
     $errorContent = "";
-
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        if (empty(trim($content))) {
+    if($_SERVER["REQUEST_METHOD"] == "POST"){
+        if(empty(trim($content))){
             $errorContent = "Answer cannot be empty.";
-        } else {
-            updateAnswer($answer_id, $content, $answer['question_slug'] );
+        }else{
+            updateAnswer($answer_id, $content, $question_slug);
         }
     }
 ?>
@@ -51,7 +59,7 @@
                     <div class="mt-4">
                         <div class="d-flex align-items-start">
                             <div class="alert alert-secondary mt-2" style="border-radius:15px;width:650px">
-                                <form action="updateAnswer.php?answer_id=<?= $answer_id;?>" method="POST">
+                                <form action="updateAnswer.php?answer_id=<?= $answer_id;?>&question_slug=<? $question_slug ?>" method="POST">
 
                                     <div class="form-group">
                                         <input type="text" name="content" class="form-control <?= (!empty($errorContent)) ? 'is-invalid' : ''; ?>" value='<?= $content;?>' autofocus style="background-color:transparent;border: none;box-shadow: none;">

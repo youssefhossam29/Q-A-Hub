@@ -9,10 +9,11 @@
     include '../../../assets/layout.php'; 
     include '../../functions/adminFunctions.php';
 
-    if(isset($_GET['errorMessage'])) {
+    if(isset($_SESSION['errorMessage'])){
         echo '<div class="container mt-4 d-flex justify-content-center">
-        <div class="alert alert-danger col-md-6 text-center">' . $_GET['errorMessage'] . '</div> </div>';
-    } 
+        <div class="alert alert-danger col-md-6 text-center">' . $_SESSION['errorMessage'] . '</div></div>';
+        unset($_SESSION['errorMessage']);
+    }
 
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $name = $_POST["name"];

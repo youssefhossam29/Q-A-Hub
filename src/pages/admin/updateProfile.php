@@ -26,15 +26,17 @@
 
 
 <?php
-    if(isset($_GET['successMessage'])) {
+    if(isset($_SESSION['successMessage'])){
         echo '<div class="container mt-4 d-flex justify-content-center">
-        <div class="alert alert-success col-md-6 text-center">' . $_GET['successMessage'] . '</div> </div>';
-        } 
-
-    if(isset($_GET['errorMessage'])) {
+        <div class="alert alert-success col-md-6 text-center">' . $_SESSION['successMessage'] . '</div></div>';
+        unset($_SESSION['successMessage']);
+    }
+    
+    if(isset($_SESSION['errorMessage'])){
         echo '<div class="container mt-4 d-flex justify-content-center">
-        <div class="alert alert-danger col-md-6 text-center">' . $_GET['errorMessage'] . '</div> </div>';
-    } 
+        <div class="alert alert-danger col-md-6 text-center">' . $_SESSION['errorMessage'] . '</div></div>';
+        unset($_SESSION['errorMessage']);
+    }
 ?>
 
 <div class="container" style="margin-bottom: 80px;">
@@ -125,7 +127,7 @@
                         <div class="row mb-0">
                             <div class="col-md-8 offset-md-4">
                                 <input type="submit" class="btn btn-primary" value="Submit">
-                                <a class="btn btn-secondary" href="allUsers.php">
+                                <a class="btn btn-secondary" href="home.php">
                                     Back
                                 </a>
                             </div>

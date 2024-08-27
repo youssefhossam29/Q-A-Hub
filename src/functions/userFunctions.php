@@ -27,15 +27,17 @@
                      LIMIT 3;
                 ";
 
-        $followed_categories_ids = isset($_SESSION['followedCategoriesIds']) ? $_SESSION['followedCategoriesIds'] : [0];
-        $ids_string = implode(',', $followed_categories_ids);
-        $query .= "SELECT c.id AS category_id, c.name AS category_name, COUNT(*) OVER() AS total_questions,b.title AS question_title,
-                    b.image AS question_image, b.slug AS question_slug, u.id AS author_id, u.name AS author_name
-                    FROM categories c
-                    JOIN questions b ON c.id = b.category_id
-                    JOIN users u ON b.author_id = u.id
-                    WHERE b.category_id IN ($ids_string)
-                    LIMIT $start, $rows_per_page;";
+        $followed_categories_ids = isset($_SESSION['followedCategoriesIds']) ? $_SESSION['followedCategoriesIds'] : [];
+        if(!empty($followed_categories_ids)){
+            $ids_string = implode(',', $followed_categories_ids);
+            $query .= "SELECT c.id AS category_id, c.name AS category_name, COUNT(*) OVER() AS total_questions,b.title AS question_title,
+                        b.image AS question_image, b.slug AS question_slug, u.id AS author_id, u.name AS author_name
+                        FROM categories c
+                        JOIN questions b ON c.id = b.category_id
+                        JOIN users u ON b.author_id = u.id
+                        WHERE b.category_id IN ($ids_string)
+                        LIMIT $start, $rows_per_page;";        
+        }
 
         $con = connection();
         $data = []; 
@@ -54,8 +56,9 @@
             header("Location: $redirectUrl");
         }
         $con->close();
+        $followed_questions = isset($data[3]) ? $data[3] : [];
         return ["latest_questions" => $data[0], "most_followed_categories" => $data[1], 
-                "most_question_categories" => $data[2], "followed_questions" => $data[3]
+                "most_question_categories" => $data[2], "followed_questions" => $followed_questions
                 ] ;  
     }
 
